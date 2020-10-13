@@ -1,0 +1,104 @@
+{
+ "cells": [
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      " * Serving Flask app \"__main__\" (lazy loading)\n",
+      " * Environment: production\n",
+      "   WARNING: This is a development server. Do not use it in a production deployment.\n",
+      "   Use a production WSGI server instead.\n",
+      " * Debug mode: off\n"
+     ]
+    },
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      " * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)\n",
+      "127.0.0.1 - - [03/Aug/2020 09:25:14] \"\u001b[37mGET / HTTP/1.1\u001b[0m\" 200 -\n",
+      "127.0.0.1 - - [03/Aug/2020 09:25:25] \"\u001b[37mPOST / HTTP/1.1\u001b[0m\" 200 -\n",
+      "127.0.0.1 - - [03/Aug/2020 09:27:16] \"\u001b[37mPOST / HTTP/1.1\u001b[0m\" 200 -\n",
+      "127.0.0.1 - - [03/Aug/2020 09:27:27] \"\u001b[37mPOST / HTTP/1.1\u001b[0m\" 200 -\n",
+      "127.0.0.1 - - [03/Aug/2020 09:28:22] \"\u001b[37mPOST / HTTP/1.1\u001b[0m\" 200 -\n",
+      "127.0.0.1 - - [03/Aug/2020 09:28:31] \"\u001b[37mPOST / HTTP/1.1\u001b[0m\" 200 -\n",
+      "127.0.0.1 - - [03/Aug/2020 09:29:03] \"\u001b[37mPOST / HTTP/1.1\u001b[0m\" 200 -\n",
+      "127.0.0.1 - - [03/Aug/2020 09:29:19] \"\u001b[37mPOST / HTTP/1.1\u001b[0m\" 200 -\n",
+      "127.0.0.1 - - [03/Aug/2020 09:30:14] \"\u001b[37mPOST / HTTP/1.1\u001b[0m\" 200 -\n"
+     ]
+    }
+   ],
+   "source": [
+    "import flask\n",
+    "import pickle\n",
+    "import pandas as pd\n",
+    "# Use pickle to load in the pre-trained model.\n",
+    "with open(f'model/bike_model_xgboost.pkl', 'rb') as f:\n",
+    "    model = pickle.load(f)\n",
+    "app = flask.Flask(__name__, template_folder='templates')\n",
+    "@app.route('/', methods=['GET', 'POST'])\n",
+    "def main():\n",
+    "    if flask.request.method == 'GET':\n",
+    "        return(flask.render_template('main.html'))\n",
+    "    if flask.request.method == 'POST':\n",
+    "        height = flask.request.form['height']\n",
+    "        weight = flask.request.form['weight']\n",
+    "        input_variables = pd.DataFrame([[height, weight]],\n",
+    "                                       columns=['height', 'weight'],\n",
+    "                                       dtype=float)\n",
+    "        prediction = model.predict(input_variables)[0]\n",
+    "        if prediction == 1:\n",
+    "            value = \"underweight\"\n",
+    "        elif prediction == 2:\n",
+    "            value=\"healthy\"\n",
+    "        elif prediction == 3:\n",
+    "            value = \"overweight\"\n",
+    "        elif prediction == 4:\n",
+    "            value =\"obese\"\n",
+    "        else:\n",
+    "            value=\"extremely obese\"\n",
+    "        return flask.render_template('main.html',\n",
+    "                                     original_input={'height':height,\n",
+    "                                                     'weight':weight},\n",
+    "                                     result=value,\n",
+    "                                     )\n",
+    "        \n",
+    "if __name__ == '__main__':\n",
+    "    app.run()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.7.3"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 2
+}
