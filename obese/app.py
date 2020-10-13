@@ -5,6 +5,8 @@ import pandas as pd
 with open(f'model/bike_model_xgboost.pkl', 'rb') as f:
     model = pickle.load(f)
 app = flask.Flask(__name__, template_folder='templates')
+app = dash.Dash()
+server = app.server
 @app.route('/', methods=['GET', 'POST'])
 def main():
     if flask.request.method == 'GET':
